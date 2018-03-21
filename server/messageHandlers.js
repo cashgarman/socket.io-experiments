@@ -33,6 +33,7 @@ module.exports =
     },
     'changeUsername': (context) =>
     {
+        console.log(context.user.name + ' changed their name to ' + context.data.name)
         context.user.name = context.data.name
         
         // TODO: Duplicated in messageHandlers

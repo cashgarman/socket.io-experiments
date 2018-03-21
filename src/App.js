@@ -68,7 +68,7 @@ class App extends Component
         <ul>
           {this.state.users.map(u => <li key={u}>{u}</li>)}
         </ul>
-        <Button onClick={this.incrementCounter.bind(this)}>Increment Counter</Button>
+        <Button onClick={this.incrementCounter.bind(this)}>Increment</Button>
         <Input onKeyDown={this.handleMessage} placeholder='Change Username...'/>
       </Container>
     )

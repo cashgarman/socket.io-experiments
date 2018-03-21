@@ -12,11 +12,11 @@ const state = {
     counter: 0
 }
 
-function onUserLogin()
+function onUsersChanged()
 {
     // TODO: Duplicated in messageHandlers
     for(var id in users)
-        if(users[id].subscribedToUsers)
+        if(users[id].client.subscribedToUsers)
             users[id].client.emit('users', _.flatMap(users, u => u.name))
 }
 
@@ -41,13 +41,13 @@ io.on('connection', (client) => {
         })
     }
 
-    onUserLogin()
+    onUsersChanged()
 
     client.on('disconnect', reason => {
         delete users[client.id];
         console.log('Client disconnected with reason: ' + reason)
         console.log('Number of users: ' + Object.keys(users).length)
-        onUserLogin()
+        onUsersChanged()
     })
 });
 
