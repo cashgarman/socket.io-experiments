@@ -39,6 +39,10 @@ class App extends Component
       'users': users => this.setState({users}),
       'chat': chat => this.setState({chat}),
     })
+
+    const name = localStorage.getItem('name')
+    if(name)
+      changeUsername(name)
   }
 
   handleUsernameChange(e)
@@ -46,6 +50,7 @@ class App extends Component
     if(e.keyCode === 13)
     {
       changeUsername(e.target.value)
+      localStorage.setItem('name', e.target.value)
       e.target.value = ''
     }
   }
