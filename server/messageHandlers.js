@@ -1,60 +1,44 @@
 var _ = require('lodash');
+var Util = require('./util')
+var moment = require('moment')
+
+const stateFetchers = {
+    'counter': state => state.counter,
+    'time': state => moment().format('MMMM Do YYYY, h:mm:ss a'),
+    'users': state => _.flatMap(state.users, u => u.name),
+    'chat': state => state.chat,
+}
+
+function broadcastState(state, subject)
+{
+    Util.sendToClients(state.clients, subject, stateFetchers[subject](state))
+}
 
 module.exports =
 {
-    'subscribeToTimer': (context) =>
+    'subscribe': (context) =>
     {
-        const interval = context.data.interval
-        console.log('client is subscribing to timer with interval ', interval);
-        setInterval(() =>
-        {
-            context.client.emit('timer', new Date());
-        }, interval);
-        context.client.emit('timer', new Date());
-    },
-    'subscribeToCounter': (context) =>
-    {
-        context.client.subscribedToCounter = true
-        context.client.emit('counter', context.state.counter);
-    },
-    'subscribeToUsers': (context) =>
-    {
-        context.client.subscribedToUsers = true
-        // TODO: Repeated in server.js
-        context.client.emit('users', _.flatMap(context.users, u => u.name))
-    },
-    'subscribeToChat': (context) =>
-    {
-        context.client.subscribedToChat = true
-        // TODO: Repeated in server.js
-        context.client.emit('chat', context.state.chat)
+        const subjects = context.data
+        context.client.subscriptions = subjects
+        subjects.forEach(s => {
+            Util.sendToClient(context.client, s, stateFetchers[s](context.state));
+        })
     },
     'incrementCounter': (context) =>
     {
         context.state.counter++
-        
-        for(var i in context.users)
-            if(context.users[i].client.subscribedToCounter)
-                context.users[i].client.emit('counter', context.state.counter);
+        broadcastState(context.state, 'counter')
     },
     'changeUsername': (context) =>
     {
         console.log(context.user.name + ' changed their name to ' + context.data.name)
         context.user.name = context.data.name
-        
-        // TODO: Duplicated in messageHandlers
-        for(var id in context.users)
-            if(context.users[id].client.subscribedToUsers)
-                context.users[id].client.emit('users', _.flatMap(users, u => u.name))
+        broadcastState(context.state, 'users')
     },
     'sendChat': (context) =>
     {
         console.log(context.user.name + ' sent chat: ' + context.data.message)
-        
         context.state.chat.push(context.user.name + ': ' + context.data.message)
-        
-        for(var id in context.users)
-            if(context.users[id].client.subscribedToChat)
-                context.users[id].client.emit('chat', context.state.chat)
+        broadcastState(context.state, 'chat')
     }
 };

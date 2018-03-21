@@ -2,10 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {
-  subscribeToTimer,
-  subscribeToCounter,
-  subscribeToUsers,
-  subscribeToChat,
+  subscribeTo,
   incrementCounter,
   changeUsername,
   sendChat,
@@ -33,21 +30,28 @@ class App extends Component
       messages: [],
     }
 
-    subscribeToTimer((err, timestamp) => this.setState({ 
-      timestamp
-    }))
+    subscribeTo({
+      'time': time => this.setState({time}),
+      'counter': counter => this.setState({counter}),
+      'users': users => this.setState({users}),
+      'chat': chat => this.setState({chat}),
+    })
 
-    subscribeToCounter((err, counter) => this.setState({ 
-      counter
-    }))
+    // subscribeToTimer((err, timestamp) => this.setState({ 
+    //   timestamp
+    // }))
 
-    subscribeToUsers((err, users) => this.setState({ 
-      users
-    }))
+    // subscribeToCounter((err, counter) => this.setState({ 
+    //   counter
+    // }))
 
-    subscribeToChat((err, chat) => this.setState({ 
-      chat
-    }))
+    // subscribeToUsers((err, users) => this.setState({ 
+    //   users
+    // }))
+
+    // subscribeToChat((err, chat) => this.setState({ 
+    //   chat
+    // }))
   }
 
   incrementCounter()
@@ -80,7 +84,7 @@ class App extends Component
       <Container text>
         <Header>Socket.io Experiments</Header>
         <Divider/>
-        <Clock time={this.state.timestamp}/>
+        <Clock time={this.state.time}/>
         Counter: {this.state.counter}<br/>
         <ul>
           {this.state.users.map(u => <li key={u}>{u}</li>)}

@@ -1,53 +1,58 @@
 const io = require('socket.io')();
 const messageHandlers = require('./messageHandlers')
-var _ = require('lodash');
-
+const _ = require('lodash');
+const Util = require('./util') 
+var moment = require('moment')
 var db = require("seraph")({
     server: "http://localhost:7474",
     pass: "klaxon" });
 console.log('Connected to Neo4J DB')
 
-users = {}
 const state = {
     counter: 0,
     chat: [],
+    users: {},
+    clients: [],
 }
 
 function onUsersChanged()
 {
     // TODO: Duplicated in messageHandlers
-    for(var id in users)
-        if(users[id].client.subscribedToUsers)
-            users[id].client.emit('users', _.flatMap(users, u => u.name))
+    Util.sendToClients(state.clients, 'users', _.flatMap(state.users, u => u.name), 'subscribedToUsers')
 }
 
 io.on('connection', (client) => {
 
     console.log('New client connected: ' + client.id)
-    users[client.id] = {client: client, name: "Unknown User (" + client.id + ")"}
-
-    console.log('Number of users: ' + Object.keys(users).length)
+    state.clients.push(client)
+    state.users[client.id] = {client: client, name: client.id}
+    console.log('Number of users: ' + state.clients.length)
     
     for(var message in messageHandlers)
     {
         const msg = message
-        client.on(message, data => {
-            messageHandlers[msg]({
-                client: client,
-                user: users[client.id],
-                users: users,
-                data: data,
-                state: state,
+        client.on(message, data =>
+            {
+                messageHandlers[msg]({
+                    client: client,
+                    user: state.users[client.id],
+                    clients: state.clients,
+                    users: state.users,
+                    data: data,
+                    state: state,
+                })
             })
-        })
     }
 
     onUsersChanged()
 
-    client.on('disconnect', reason => {
-        delete users[client.id];
-        console.log('Client disconnected with reason: ' + reason)
-        console.log('Number of users: ' + Object.keys(users).length)
+    client.on('disconnect', reason =>
+    {
+        console.log('Client ' + state.users[client.id].name + 'disconnected with reason: ' + reason)
+        delete state.users[client.id];
+        _.remove(state.clients, c => c.id == client.id)
+        console.log('Number of users: ' + state.clients.length)
+
         onUsersChanged()
     })
 });
@@ -55,3 +60,9 @@ io.on('connection', (client) => {
 const port = 8000;
 io.listen(port);
 console.log('listening on port ', port);
+
+// Start the timer
+setInterval(() =>
+{
+    Util.sendToClients(state.clients, 'time', moment().format('MMMM Do YYYY, h:mm:ss a'))
+}, 1000);

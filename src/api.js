@@ -2,29 +2,43 @@ import openSocket from 'socket.io-client';
 
 const socket = openSocket('http://dev.ventureviewer.com:8000');
 
-function subscribeToTimer(cb)
+function subscribeTo(subjects, cb)
 {
-    socket.on('timer', timestamp => cb(null, timestamp));
-    socket.emit('subscribeToTimer', {interval: 1000});
+    for(var subject in subjects)
+    {
+        // Closure
+        const s = subject
+        const callback = subjects[s]
+        
+        socket.on(s, data => callback(data));
+        console.log('Subscribing to ' + subject)
+    }
+    socket.emit('subscribe', Object.keys(subjects));
 }
 
-function subscribeToCounter(cb)
-{
-    socket.on('counter', counter => cb(null, counter));
-    socket.emit('subscribeToCounter');
-}
+// function subscribeToTimer(cb)
+// {
+//     socket.on('timer', timestamp => cb(null, timestamp));
+//     socket.emit('subscribeToTimer', {interval: 1000});
+// }
 
-function subscribeToUsers(cb)
-{
-    socket.on('users', users => cb(null, users));
-    socket.emit('subscribeToUsers');
-}
+// function subscribeToCounter(cb)
+// {
+//     socket.on('counter', counter => cb(null, counter));
+//     socket.emit('subscribeToCounter');
+// }
 
-function subscribeToChat(cb)
-{
-    socket.on('chat', chat => cb(null, chat));
-    socket.emit('subscribeToChat');
-}
+// function subscribeToUsers(cb)
+// {
+//     socket.on('users', users => cb(null, users));
+//     socket.emit('subscribeToUsers');
+// }
+
+// function subscribeToChat(cb)
+// {
+//     socket.on('chat', chat => cb(null, chat));
+//     socket.emit('subscribeToChat');
+// }
 
 function incrementCounter()
 {
@@ -42,10 +56,7 @@ function sendChat(message)
 }
 
 export {
-    subscribeToTimer,
-    subscribeToCounter,
-    subscribeToUsers,
-    subscribeToChat,
+    subscribeTo,
     incrementCounter,
     changeUsername,
     sendChat,
