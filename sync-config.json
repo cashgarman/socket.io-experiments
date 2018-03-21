@@ -1,0 +1,8 @@
+{
+    "username": "ubuntu",
+    "privateKey": "/mnt/c/Users/Otterbox/Downloads/VV-dev.pem",
+    "host": "dev.ventureviewer.com",
+    "port": "22",
+    "localPath": "/mnt/c/hacktheplanet/socket.io-experiments",
+    "remotePath": "/home/ubuntu/socket.io-experiments"
+}
