@@ -6,6 +6,7 @@ import {
   incrementCounter,
   changeUsername,
   sendChat,
+  getRandom,
 } from './api';
 import Clock from './components/Clock'
 import {
@@ -23,7 +24,8 @@ class App extends Component
     super(props)
 
     this.state = {
-      timestamp: 'N/A',
+      time: 'N/A',
+      random: 'N/A',
       counter: 0,
       chat: [],
       users: [],
@@ -32,32 +34,11 @@ class App extends Component
 
     subscribeTo({
       'time': time => this.setState({time}),
+      'random': random => this.setState({random}),
       'counter': counter => this.setState({counter}),
       'users': users => this.setState({users}),
       'chat': chat => this.setState({chat}),
     })
-
-    // subscribeToTimer((err, timestamp) => this.setState({ 
-    //   timestamp
-    // }))
-
-    // subscribeToCounter((err, counter) => this.setState({ 
-    //   counter
-    // }))
-
-    // subscribeToUsers((err, users) => this.setState({ 
-    //   users
-    // }))
-
-    // subscribeToChat((err, chat) => this.setState({ 
-    //   chat
-    // }))
-  }
-
-  incrementCounter()
-  {
-    console.log('Incrementing')
-    incrementCounter()
   }
 
   handleUsernameChange(e)
@@ -86,10 +67,11 @@ class App extends Component
         <Divider/>
         <Clock time={this.state.time}/>
         Counter: {this.state.counter}<br/>
+        Random: <a href='#' onClick={getRandom}>{this.state.random}</a><br/>
         <ul>
           {this.state.users.map(u => <li key={u}>{u}</li>)}
         </ul>
-        <Button onClick={this.incrementCounter.bind(this)}>Increment</Button><br/>
+        <Button onClick={incrementCounter}>Increment</Button><br/>
         <Input onKeyDown={this.handleUsernameChange} placeholder='Change Username...'/><br/>
         <Input onKeyDown={this.handleChatMessage} placeholder='Chat...'/><br/>
         <ul>

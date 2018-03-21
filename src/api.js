@@ -9,36 +9,12 @@ function subscribeTo(subjects, cb)
         // Closure
         const s = subject
         const callback = subjects[s]
-        
+
         socket.on(s, data => callback(data));
         console.log('Subscribing to ' + subject)
     }
     socket.emit('subscribe', Object.keys(subjects));
 }
-
-// function subscribeToTimer(cb)
-// {
-//     socket.on('timer', timestamp => cb(null, timestamp));
-//     socket.emit('subscribeToTimer', {interval: 1000});
-// }
-
-// function subscribeToCounter(cb)
-// {
-//     socket.on('counter', counter => cb(null, counter));
-//     socket.emit('subscribeToCounter');
-// }
-
-// function subscribeToUsers(cb)
-// {
-//     socket.on('users', users => cb(null, users));
-//     socket.emit('subscribeToUsers');
-// }
-
-// function subscribeToChat(cb)
-// {
-//     socket.on('chat', chat => cb(null, chat));
-//     socket.emit('subscribeToChat');
-// }
 
 function incrementCounter()
 {
@@ -55,9 +31,15 @@ function sendChat(message)
     socket.emit('sendChat', {message: message});
 }
 
+function getRandom()
+{
+    socket.emit('getRandom');
+}
+
 export {
     subscribeTo,
     incrementCounter,
     changeUsername,
     sendChat,
+    getRandom,
 };
