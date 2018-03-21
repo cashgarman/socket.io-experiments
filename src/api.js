@@ -20,6 +20,12 @@ function subscribeToUsers(cb)
     socket.emit('subscribeToUsers');
 }
 
+function subscribeToChat(cb)
+{
+    socket.on('chat', chat => cb(null, chat));
+    socket.emit('subscribeToChat');
+}
+
 function incrementCounter()
 {
     socket.emit('incrementCounter');
@@ -30,10 +36,17 @@ function changeUsername(name)
     socket.emit('changeUsername', {name: name});
 }
 
+function sendChat(message)
+{
+    socket.emit('sendChat', {message: message});
+}
+
 export {
     subscribeToTimer,
     subscribeToCounter,
     subscribeToUsers,
+    subscribeToChat,
     incrementCounter,
     changeUsername,
+    sendChat,
 };

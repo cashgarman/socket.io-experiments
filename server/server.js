@@ -9,7 +9,8 @@ console.log('Connected to Neo4J DB')
 
 users = {}
 const state = {
-    counter: 0
+    counter: 0,
+    chat: [],
 }
 
 function onUsersChanged()

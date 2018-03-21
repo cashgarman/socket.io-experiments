@@ -23,6 +23,12 @@ module.exports =
         // TODO: Repeated in server.js
         context.client.emit('users', _.flatMap(context.users, u => u.name))
     },
+    'subscribeToChat': (context) =>
+    {
+        context.client.subscribedToChat = true
+        // TODO: Repeated in server.js
+        context.client.emit('chat', context.state.chat)
+    },
     'incrementCounter': (context) =>
     {
         context.state.counter++
@@ -40,5 +46,15 @@ module.exports =
         for(var id in context.users)
             if(context.users[id].client.subscribedToUsers)
                 context.users[id].client.emit('users', _.flatMap(users, u => u.name))
+    },
+    'sendChat': (context) =>
+    {
+        console.log(context.user.name + ' sent chat: ' + context.data.message)
+        
+        context.state.chat.push(context.user.name + ': ' + context.data.message)
+        
+        for(var id in context.users)
+            if(context.users[id].client.subscribedToChat)
+                context.users[id].client.emit('chat', context.state.chat)
     }
 };

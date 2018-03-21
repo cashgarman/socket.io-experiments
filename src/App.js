@@ -5,8 +5,10 @@ import {
   subscribeToTimer,
   subscribeToCounter,
   subscribeToUsers,
+  subscribeToChat,
   incrementCounter,
-  changeUsername
+  changeUsername,
+  sendChat,
 } from './api';
 import Clock from './components/Clock'
 import {
@@ -24,9 +26,11 @@ class App extends Component
     super(props)
 
     this.state = {
-      timestamp: 'no timestamp yet',
+      timestamp: 'N/A',
       counter: 0,
-      users: []
+      chat: [],
+      users: [],
+      messages: [],
     }
 
     subscribeToTimer((err, timestamp) => this.setState({ 
@@ -40,6 +44,10 @@ class App extends Component
     subscribeToUsers((err, users) => this.setState({ 
       users
     }))
+
+    subscribeToChat((err, chat) => this.setState({ 
+      chat
+    }))
   }
 
   incrementCounter()
@@ -48,11 +56,20 @@ class App extends Component
     incrementCounter()
   }
 
-  handleMessage(e)
+  handleUsernameChange(e)
   {
     if(e.keyCode === 13)
     {
       changeUsername(e.target.value)
+      e.target.value = ''
+    }
+  }
+
+  handleChatMessage(e)
+  {
+    if(e.keyCode === 13)
+    {
+      sendChat(e.target.value)
       e.target.value = ''
     }
   }
@@ -68,8 +85,12 @@ class App extends Component
         <ul>
           {this.state.users.map(u => <li key={u}>{u}</li>)}
         </ul>
-        <Button onClick={this.incrementCounter.bind(this)}>Increment</Button>
-        <Input onKeyDown={this.handleMessage} placeholder='Change Username...'/>
+        <Button onClick={this.incrementCounter.bind(this)}>Increment</Button><br/>
+        <Input onKeyDown={this.handleUsernameChange} placeholder='Change Username...'/><br/>
+        <Input onKeyDown={this.handleChatMessage} placeholder='Chat...'/><br/>
+        <ul>
+          {this.state.chat.map(m => <li key={m}>{m}</li>)}
+        </ul>
       </Container>
     )
   }
